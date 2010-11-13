@@ -11,11 +11,13 @@ from tornado.options import define, options
 import pubsub
 
 define("port", default=8000, help="run on the given port", type=int)
+define("default_timeout", default=None, help="the default subscription timeout", type=int)
 
 class PubSub(tornado.web.Application):
-    def __init__(self):
+    def __init__(self, default_timeout):
+        self.default_timeout = default_timeout
+
         self.subscribers    = defaultdict(set)
-        self.timeouts       = defaultdict(set)
         handlers = [
         (r'/subscribe/(.+)', pubsub.SubscribeHandler),
         (r'/publish/(.+)', pubsub.PublishHandler),
@@ -25,7 +27,8 @@ class PubSub(tornado.web.Application):
 
 def main():
     tornado.options.parse_command_line()
-    application = PubSub()
+    default_timeout = options.default_timeout
+    application = PubSub(default_timeout)
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
