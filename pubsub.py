@@ -14,15 +14,26 @@ class BaseHandler(tornado.web.RequestHandler):
         return self.application.timeouts
 
 class SubscribeHandler(BaseHandler):
-    def on_connection_close(self):
+    def _cleanup(self):
         to_remove = self._get_subscription_key()
         try:
             self.subscribers[to_remove].remove(self._on_response)
         except KeyError:
             pass
 
+    def on_connection_close(self):
+        self._cleanup()
+
     @tornado.web.asynchronous
     def get(self, resource):
+        # figure out if the connection should be closed
+        # or not
+        connection_header = self.request.headers.get('Connection', None)
+        if connection_header == 'close':
+            self._close_connection = True
+        else:
+            self._close_connection = False
+
         self.resource = resource
         self._add_subscriber()
 
@@ -54,12 +65,15 @@ class SubscribeHandler(BaseHandler):
             return self.application.default_timeout
     
     def _on_timeout(self):
+        # always close the connection if 
+        # there is a timeout
+        self.set_header('Connection', 'close')
         try:
             self.write('timeout')
         except IOError:
             pass
         # clear the subscribers
-        self.on_connection_close()
+        self._cleanup()
         self.finish()
 
     def _on_response(self, response):
@@ -69,11 +83,12 @@ class SubscribeHandler(BaseHandler):
         except AttributeError:
             pass # there was no timeout set
 
-        self.set_header("Cache-Control", "no-store")
         self.write(response)
-        self.on_connection_close()
-        self.finish()
-
+        if self._close_connection:
+            self._cleanup()
+            self.finish()
+        else:
+            self.flush()
 
 class PublishHandler(BaseHandler):
     def post(self, resource):
@@ -101,4 +116,3 @@ class PublishHandler(BaseHandler):
         to_add = self.subscribers[s]
         subscribers.update(to_add)
         return subscribers
-
