@@ -55,6 +55,7 @@ class SubscribeHandler(BaseHandler):
 
     def _add_subscriber(self):
         self.subscribers[self._get_subscription_key()].add(self._on_response) 
+        import pdb; pdb.set_trace()
 
     def _get_timeout(self):
         request_timeout = self.get_argument('timeout', None)
@@ -105,6 +106,7 @@ class PublishHandler(BaseHandler):
         self.subscribers[resource] = set()
 
     def _get_subscribers(self, resource):
+        import pdb; pdb.set_trace()
         subscribers = set()
         parts = resource.split('.')
         for i in xrange(len(parts)):
@@ -114,5 +116,10 @@ class PublishHandler(BaseHandler):
             subscribers.update(to_add)
         s = 'specific:%s' % resource
         to_add = self.subscribers[s]
+        subscribers.update(to_add)
+
+        # now add the most general subscribers
+        # who want everything
+        to_add = self.subscribers['general:']
         subscribers.update(to_add)
         return subscribers

@@ -1,11 +1,13 @@
 # tornadowatch
 
-`tornadowatch` is a simple HTTP publish/subscribe server written in [tornado](http://www.tornadoweb.org/ "tornado"), it has been tested with python 2.5 and 2.6, and [tornado v1.1.0](https://github.com/facebook/tornado/tree/v1.1.0 "v1.1.0").
+`tornadowatch` is a simple HTTP publish/subscribe server written in [tornado](http://www.tornadoweb.org/ "tornado"). It has been tested with python 2.5 and 2.6, and [tornado v1.1.0](https://github.com/facebook/tornado/tree/v1.1.0 "v1.1.0").
 
 ## features
 
 * handles many concurrent connections
 * wildcard topic names. eg. sports.soccer.* (the .* can only occur at the end of the topic name)
+* optional timeouts
+* optional subscription connection closing after one publication
 
 ## persistent connection example
 
@@ -29,5 +31,6 @@ You can subscribe to topics as general or specifically as you like. Here are som
 
 1. `/subscribe/sports.soccer` will only receive publications to `sports.soccer` exactly.
 2. `/subscribe/sports.*` will receive publications to `sports`, `sports.soccer`, `sports.basketball`, etc.
+3. `/subscribe/.*` will receive publications sent to any topic
 
 
