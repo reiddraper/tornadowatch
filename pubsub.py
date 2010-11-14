@@ -55,7 +55,6 @@ class SubscribeHandler(BaseHandler):
 
     def _add_subscriber(self):
         self.subscribers[self._get_subscription_key()].add(self._on_response) 
-        import pdb; pdb.set_trace()
 
     def _get_timeout(self):
         request_timeout = self.get_argument('timeout', None)
@@ -69,10 +68,6 @@ class SubscribeHandler(BaseHandler):
         # always close the connection if 
         # there is a timeout
         self.set_header('Connection', 'close')
-        try:
-            self.write('timeout')
-        except IOError:
-            pass
         # clear the subscribers
         self._cleanup()
         self.finish()
@@ -106,7 +101,6 @@ class PublishHandler(BaseHandler):
         self.subscribers[resource] = set()
 
     def _get_subscribers(self, resource):
-        import pdb; pdb.set_trace()
         subscribers = set()
         parts = resource.split('.')
         for i in xrange(len(parts)):

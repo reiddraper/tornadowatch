@@ -39,3 +39,7 @@ You can ask the server to close the connection after a specified number of secon
 
 `curl -X GET "localhost:8000/subscribe/test?timeout=60`
 
+## TODO
+
+* add support for websockets
+
