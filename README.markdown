@@ -6,8 +6,8 @@
 
 * handles many concurrent connections
 * wildcard topic names. eg. sports.soccer.* (the .* can only occur at the end of the topic name)
-* optional timeouts
 * optional subscription connection closing after one publication
+* optional timeouts
 
 ## persistent connection example
 
@@ -33,4 +33,9 @@ You can subscribe to topics as general or specifically as you like. Here are som
 2. `/subscribe/sports.*` will receive publications to `sports`, `sports.soccer`, `sports.basketball`, etc.
 3. `/subscribe/.*` will receive publications sent to any topic
 
+## timeout example
+
+You can ask the server to close the connection after a specified number of seconds. For example:
+
+`curl -X GET "localhost:8000/subscribe/test?timeout=60`
 
